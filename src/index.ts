@@ -114,9 +114,11 @@ export class InjectedConnector extends AbstractConnector {
     const account = await this.activateBase()
 
     const isSeveralProviders = Array.isArray(window.ethereum?.providers)
-    const provider = isSeveralProviders ? window.ethereum?.providers?.find((provider) => (provider as any)[identifierKey]) : window.ethereum
+    const provider = isSeveralProviders
+      ? window.ethereum?.providers?.find(provider => (provider as any)[identifierKey])
+      : window.ethereum
 
-    warning(!provider, `No provider found with identifierKey ${identifierKey}, falling back to window.ethereum`)    
+    warning(!provider, `No provider found with identifierKey ${identifierKey}, falling back to window.ethereum`)
 
     return { provider, ...(account ? { account } : {}) }
   }
