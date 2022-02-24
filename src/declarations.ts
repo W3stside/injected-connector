@@ -5,8 +5,16 @@ interface Ethereum {
   removeListener?: (method: string, listener: (...args: any[]) => void) => void
 }
 
+interface Provider {
+  identifierKey?: string
+}
+
+interface AugmentedEthereum extends Ethereum {
+  providers?: Provider[]
+}
+
 declare interface Window {
-  ethereum?: Ethereum
+  ethereum?: AugmentedEthereum
 }
 
 declare const __DEV__: boolean

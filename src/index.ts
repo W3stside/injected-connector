@@ -66,7 +66,7 @@ export class InjectedConnector extends AbstractConnector {
     this.emitUpdate({ chainId: networkId, provider: window.ethereum })
   }
 
-  public async activate(): Promise<ConnectorUpdate> {
+  private async activateBase() {
     if (!window.ethereum) {
       throw new NoEthereumProviderError()
     }
@@ -101,7 +101,24 @@ export class InjectedConnector extends AbstractConnector {
       account = await window.ethereum.enable().then(sendReturn => sendReturn && parseSendReturn(sendReturn)[0])
     }
 
+    return account
+  }
+
+  public async activate() {
+    const account = await this.activateBase()
+
     return { provider: window.ethereum, ...(account ? { account } : {}) }
+  }
+
+  public async activateSpecific(identifierKey: string): Promise<ConnectorUpdate> {
+    const account = await this.activateBase()
+
+    const isSeveralProviders = Array.isArray(window.ethereum?.providers)
+    const provider = isSeveralProviders ? window.ethereum?.providers?.find((provider) => (provider as any)[identifierKey]) : window.ethereum
+
+    warning(!provider, `No provider found with identifierKey ${identifierKey}, falling back to window.ethereum`)    
+
+    return { provider, ...(account ? { account } : {}) }
   }
 
   public async getProvider(): Promise<any> {
